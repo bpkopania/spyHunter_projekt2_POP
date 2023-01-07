@@ -2,6 +2,7 @@
 #include<math.h>
 #include<stdio.h>
 #include<string.h>
+#include "SDL_handler.h"
 
 extern "C" {
 #include"SDL2-2.0.10/include/SDL.h"
