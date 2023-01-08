@@ -11,6 +11,8 @@ extern "C" {
 
 #define SCREEN_WIDTH	640
 #define SCREEN_HEIGHT	480
+#define ROAD_WIDTH 100
+#define CAR_WIDTH 45
 
 // main
 #ifdef __cplusplus
@@ -34,8 +36,8 @@ int main(int argc, char **argv) {
 	// the option:
 	// project -> szablon2 properties -> Linker -> System -> Subsystem
 	// must be changed to "Console"
-	printf("wyjscie printfa trafia do tego okienka\n");
-	printf("printf output goes here\n");
+	/*printf("wyjscie printfa trafia do tego okienka\n");
+	printf("printf output goes here\n");*/
 
 	if(SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 		printf("SDL_Init error: %s\n", SDL_GetError());
@@ -57,7 +59,7 @@ int main(int argc, char **argv) {
 	SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
-	SDL_SetWindowTitle(window, "Szablon do zdania drugiego 2017");
+	SDL_SetWindowTitle(window, "Bartosz Kopania 193169");
 
 
 	screen = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32,
@@ -98,7 +100,7 @@ int main(int argc, char **argv) {
 
 	char text[128];
 	int czarny = SDL_MapRGB(screen->format, 0x00, 0x00, 0x00);
-	int zielony = SDL_MapRGB(screen->format, 0x00, 0xFF, 0x00);
+	int zielony = SDL_MapRGB(screen->format, 0x00, 0x99, 0x00);
 	int czerwony = SDL_MapRGB(screen->format, 0xFF, 0x00, 0x00);
 	int niebieski = SDL_MapRGB(screen->format, 0x11, 0x11, 0xCC);
 
@@ -130,10 +132,6 @@ int main(int argc, char **argv) {
 
 		SDL_FillRect(screen, NULL, czarny);
 
-		DrawSurface(screen, eti,
-					SCREEN_WIDTH / 2 + sin(distance) * SCREEN_HEIGHT / 3,
-				SCREEN_HEIGHT / 2 + cos(distance) * SCREEN_HEIGHT / 3);
-
 		fpsTimer += delta;
 		if(fpsTimer > 0.5) {
 			fps = frames * 2;
@@ -141,14 +139,28 @@ int main(int argc, char **argv) {
 			fpsTimer -= 0.5;
 			};
 
+		//road
+		DrawRectangle(screen, 0, 56, SCREEN_WIDTH / 2 - ROAD_WIDTH, SCREEN_HEIGHT - 52, zielony, zielony);
+		DrawRectangle(screen, SCREEN_WIDTH/2+ROAD_WIDTH, 56, SCREEN_WIDTH / 2 - ROAD_WIDTH, SCREEN_HEIGHT - 52, zielony, zielony);
+
 		// tekst informacyjny / info text
-		DrawRectangle(screen, 4, 4, SCREEN_WIDTH - 8, 36, czerwony, niebieski);
+		DrawRectangle(screen, 4, 4, SCREEN_WIDTH - 8, 52, czerwony, niebieski);
+		sprintf(text, "Bartosz Kopania 193169 inf gr 4");
+		DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 10, text, charset);
 		//            "template for the second project, elapsed time = %.1lf s  %.0lf frames / s"
 		sprintf(text, "Szablon drugiego zadania, czas trwania = %.1lf s  %.0lf klatek / s", worldTime, fps);
-		DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 10, text, charset);
+		DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 26, text, charset);
 		//	      "Esc - exit, \030 - faster, \031 - slower"
 		sprintf(text, "Esc - wyjscie, \030 - przyspieszenie, \031 - zwolnienie");
-		DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 26, text, charset);
+		DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 42, text, charset);
+
+		DrawRectangle(screen, SCREEN_WIDTH-260, SCREEN_HEIGHT-36, 250, 26, czerwony, niebieski);
+		sprintf(text, "abcdef");
+		DrawString(screen, SCREEN_WIDTH-250, SCREEN_HEIGHT - 26, text, charset);
+
+		DrawSurface(screen, eti,
+			SCREEN_WIDTH / 2 + sin(distance) * SCREEN_HEIGHT / 3,
+			SCREEN_HEIGHT / 2 + cos(distance) * SCREEN_HEIGHT / 3);
 
 		SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
 //		SDL_RenderClear(renderer);
@@ -160,8 +172,11 @@ int main(int argc, char **argv) {
 			switch(event.type) {
 				case SDL_KEYDOWN:
 					if(event.key.keysym.sym == SDLK_ESCAPE) quit = 1;
+					else if (event.key.keysym.sym == SDLK_n) quit = 1;
 					else if(event.key.keysym.sym == SDLK_UP) etiSpeed = etiSpeed*1.5;
 					else if(event.key.keysym.sym == SDLK_DOWN) etiSpeed = 0.3;
+					else if (event.key.keysym.sym == SDLK_RIGHT) etiSpeed = 0.3;
+					else if (event.key.keysym.sym == SDLK_LEFT) etiSpeed = 0.3;
 					break;
 				case SDL_KEYUP:
 					etiSpeed = 1.0;
@@ -169,10 +184,10 @@ int main(int argc, char **argv) {
 				case SDL_QUIT:
 					quit = 1;
 					break;
-				};
 			};
-		frames++;
 		};
+		frames++;
+	};
 
 	// zwolnienie powierzchni / freeing all surfaces
 	SDL_FreeSurface(charset);
@@ -183,4 +198,4 @@ int main(int argc, char **argv) {
 
 	SDL_Quit();
 	return 0;
-	};
+};
