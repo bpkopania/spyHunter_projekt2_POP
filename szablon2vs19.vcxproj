@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SDL_handler.cpp" />
   </ItemGroup>
@@ -27,6 +28,7 @@
     <Image Include="eti.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="game.h" />
     <ClInclude Include="SDL_handler.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
