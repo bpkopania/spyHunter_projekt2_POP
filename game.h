@@ -5,6 +5,8 @@
 #define CAR_WIDTH 20
 #define CAR_HEIGHT 62
 
+#define STARTING_LIVES 3
+
 #define MAX_SPEED 45
 #define TURN_SPEED 4
 
@@ -15,7 +17,10 @@ public:
 	double time;
 	long long int score;
 	int position;
-	//int peanulty;
+	int peanulty;
+	int peanulty_start;
+	int lives;
+	bool isPause;
 	
 	game();
 
@@ -28,5 +33,7 @@ public:
 	void movingToRight();
 
 	void movingToLeft();
+
+	void pause();
 };
 

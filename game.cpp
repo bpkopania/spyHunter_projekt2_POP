@@ -6,6 +6,10 @@ game::game()
 	time = 0;
 	score = 0;
 	position = 0;
+	peanulty = 0;
+	peanulty_start = 0;
+	lives = STARTING_LIVES;
+	isPause = false;
 }
 
 void game::newGame()
@@ -14,6 +18,10 @@ void game::newGame()
 	time = 0;
 	score = 0;
 	position = 0;
+	peanulty = 0;
+	peanulty_start = 0;
+	lives = STARTING_LIVES;
+	isPause = false;
 }
 
 void game::speeding()
@@ -66,4 +74,9 @@ void game::movingToLeft()
 			//position = 0;
 		}
 	}
+}
+
+void game::pause()
+{
+	isPause = !isPause;
 }

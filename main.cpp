@@ -2,13 +2,13 @@
 #include<math.h>
 #include<stdio.h>
 #include<string.h>
+
 #include "SDL_handler.h"
 #include "game.h"
+#include "saver.h"
 
-extern "C" {
 #include"SDL2-2.0.10/include/SDL.h"
 #include"SDL2-2.0.10/include/SDL_main.h"
-}
 
 #define SCREEN_WIDTH	640
 #define SCREEN_HEIGHT	480
@@ -19,15 +19,13 @@ extern "C" {
 long long int scoreByRide(double time, int speed);
 
 // main
-#ifdef __cplusplus
-extern "C"
-#endif
 int main(int argc, char **argv) {
 	int t1, t2, quit, frames, rc;
 	double delta, fpsTimer, fps, distance, etiSpeed;
 	SDL_Event event;
 	SDL_Surface *screen, *charset;
 	SDL_Surface *car;
+	SDL_Surface* bush;
 	SDL_Texture *scrtex;
 	SDL_Window *window;
 	SDL_Renderer *renderer;
@@ -102,6 +100,18 @@ int main(int argc, char **argv) {
 		return 1;
 		};
 
+	bush = SDL_LoadBMP("./bush.bmp");
+	if (bush == NULL) {
+		printf("SDL_LoadBMP(eti.bmp) error: %s\n", SDL_GetError());
+		SDL_FreeSurface(charset);
+		SDL_FreeSurface(screen);
+		SDL_DestroyTexture(scrtex);
+		SDL_DestroyWindow(window);
+		SDL_DestroyRenderer(renderer);
+		SDL_Quit();
+		return 1;
+	};
+
 	char text[128];
 	int czarny = SDL_MapRGB(screen->format, 0x00, 0x00, 0x00);
 	int zielony = SDL_MapRGB(screen->format, 0x00, 0x99, 0x00);
@@ -121,29 +131,33 @@ int main(int argc, char **argv) {
 	game stats;
 
 	while(!quit) {
-		t2 = SDL_GetTicks();
 
-		// w tym momencie t2-t1 to czas w milisekundach,
-		// jaki uplyna³ od ostatniego narysowania ekranu
-		// delta to ten sam czas w sekundach
-		// here t2-t1 is the time in milliseconds since
-		// the last screen was drawn
-		// delta is the same time in seconds
-		delta = (t2 - t1) * 0.001;
-		t1 = t2;
+		if (!stats.isPause)
+		{
+			t2 = SDL_GetTicks();
 
-		stats.time += delta;
+			// w tym momencie t2-t1 to czas w milisekundach,
+			// jaki uplyna³ od ostatniego narysowania ekranu
+			// delta to ten sam czas w sekundach
+			// here t2-t1 is the time in milliseconds since
+			// the last screen was drawn
+			// delta is the same time in seconds
+			delta = (t2 - t1) * 0.001;
+			t1 = t2;
 
-		distance += etiSpeed * delta;
+			stats.time += delta;
 
-		SDL_FillRect(screen, NULL, czarny);
+			distance += etiSpeed * delta;
 
-		fpsTimer += delta;
-		if(fpsTimer > 0.5) {
-			fps = frames * 2;
-			frames = 0;
-			fpsTimer -= 0.5;
+			SDL_FillRect(screen, NULL, czarny);
+
+			fpsTimer += delta;
+			if (fpsTimer > 0.5) {
+				fps = frames * 2;
+				frames = 0;
+				fpsTimer -= 0.5;
 			};
+		}
 
 		//road
 		DrawRectangle(screen, 0, 56, SCREEN_WIDTH / 2 - ROAD_WIDTH, SCREEN_HEIGHT - 52, zielony, zielony);
@@ -164,10 +178,6 @@ int main(int argc, char **argv) {
 		sprintf_s(text, "abcdefg");
 		DrawString(screen, SCREEN_WIDTH-250, SCREEN_HEIGHT - 26, text, charset);
 
-		/*DrawSurface(screen, eti,
-			SCREEN_WIDTH / 2 + sin(distance) * SCREEN_HEIGHT / 3,
-			SCREEN_HEIGHT / 2 + cos(distance) * SCREEN_HEIGHT / 3);*/
-
 		DrawSurface(screen, car, SCREEN_WIDTH / 2 + stats.position, SCREEN_HEIGHT - CAR_POS_FROM_BOTTOM - CAR_HEIGHT);
 
 		SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
@@ -175,9 +185,16 @@ int main(int argc, char **argv) {
 		SDL_RenderCopy(renderer, scrtex, NULL, NULL);
 		SDL_RenderPresent(renderer);
 
-
-		//stats.speed = etiSpeed;
-		stats.score += scoreByRide(delta, stats.speed);
+		if (!stats.isPause)
+		{
+			stats.score += scoreByRide(delta, stats.speed);
+		}
+		else
+		{
+			sprintf_s(text, "Game is Paused");
+			DrawString(screen, SCREEN_WIDTH/2-strlen(text)*4, SCREEN_HEIGHT/2, text, charset);
+		}
+		
 
 		// obs³uga zdarzeñ (o ile jakieœ zasz³y) / handling of events (if there were any)
 		while(SDL_PollEvent(&event)) {
@@ -185,10 +202,13 @@ int main(int argc, char **argv) {
 				case SDL_KEYDOWN:
 					if (event.key.keysym.sym == SDLK_ESCAPE) quit = 1;
 					else if (event.key.keysym.sym == SDLK_n) stats.newGame();
-					else if (event.key.keysym.sym == SDLK_UP) stats.speeding();
-					else if (event.key.keysym.sym == SDLK_DOWN) stats.slowing();
-					else if (event.key.keysym.sym == SDLK_RIGHT) stats.movingToRight();
-					else if (event.key.keysym.sym == SDLK_LEFT) stats.movingToLeft();
+					else if (event.key.keysym.sym == SDLK_p) stats.pause();
+					else if (event.key.keysym.sym == SDLK_s) save(stats);
+					else if (event.key.keysym.sym == SDLK_l) load(&stats);
+					else if (event.key.keysym.sym == SDLK_UP && !stats.isPause) stats.speeding();
+					else if (event.key.keysym.sym == SDLK_DOWN && !stats.isPause) stats.slowing();
+					else if (event.key.keysym.sym == SDLK_RIGHT && !stats.isPause) stats.movingToRight();
+					else if (event.key.keysym.sym == SDLK_LEFT && !stats.isPause) stats.movingToLeft();
 					break;
 				case SDL_KEYUP:
 					etiSpeed = 1.0;
