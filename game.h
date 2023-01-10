@@ -35,5 +35,8 @@ public:
 	void movingToLeft();
 
 	void pause();
+
+private:
+	void game_setter();
 };
 

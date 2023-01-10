@@ -16,12 +16,17 @@
 #define SCORE_BY_RIDE 30
 #define CAR_POS_FROM_BOTTOM 30
 
+#define BUSH_SPEED 40
+
 long long int scoreByRide(double time, int speed);
 
 // main
 int main(int argc, char **argv) {
 	int t1, t2, quit, frames, rc;
-	double delta, fpsTimer, fps, distance, etiSpeed;
+	double delta, fpsTimer, fps;
+
+	int bush_pos = 0;
+
 	SDL_Event event;
 	SDL_Surface *screen, *charset;
 	SDL_Surface *car;
@@ -113,6 +118,7 @@ int main(int argc, char **argv) {
 	};
 
 	char text[128];
+	char textInfo[128];
 	int czarny = SDL_MapRGB(screen->format, 0x00, 0x00, 0x00);
 	int zielony = SDL_MapRGB(screen->format, 0x00, 0x99, 0x00);
 	int czerwony = SDL_MapRGB(screen->format, 0xFF, 0x00, 0x00);
@@ -124,10 +130,7 @@ int main(int argc, char **argv) {
 	fpsTimer = 0;
 	fps = 0;
 	quit = 0;
-	//worldTime = 0;
-	distance = 0;
-	etiSpeed = 1;
-
+	sprintf_s(textInfo, "");
 	game stats;
 
 	while(!quit) {
@@ -147,8 +150,6 @@ int main(int argc, char **argv) {
 
 			stats.time += delta;
 
-			distance += etiSpeed * delta;
-
 			SDL_FillRect(screen, NULL, czarny);
 
 			fpsTimer += delta;
@@ -162,6 +163,9 @@ int main(int argc, char **argv) {
 		//road
 		DrawRectangle(screen, 0, 56, SCREEN_WIDTH / 2 - ROAD_WIDTH, SCREEN_HEIGHT - 52, zielony, zielony);
 		DrawRectangle(screen, SCREEN_WIDTH/2+ROAD_WIDTH, 56, SCREEN_WIDTH / 2 - ROAD_WIDTH, SCREEN_HEIGHT - 52, zielony, zielony);
+
+		//bush
+		DrawSurface(screen, bush, 60, bush_pos / BUSH_SPEED + 46);
 
 		// tekst informacyjny / info text
 		DrawRectangle(screen, 4, 4, SCREEN_WIDTH - 8, 52, czerwony, niebieski);
@@ -180,6 +184,10 @@ int main(int argc, char **argv) {
 
 		DrawSurface(screen, car, SCREEN_WIDTH / 2 + stats.position, SCREEN_HEIGHT - CAR_POS_FROM_BOTTOM - CAR_HEIGHT);
 
+		
+
+		DrawString(screen, 6, SCREEN_HEIGHT - 26, textInfo, charset);
+
 		SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
 //		SDL_RenderClear(renderer);
 		SDL_RenderCopy(renderer, scrtex, NULL, NULL);
@@ -188,6 +196,8 @@ int main(int argc, char **argv) {
 		if (!stats.isPause)
 		{
 			stats.score += scoreByRide(delta, stats.speed);
+			bush_pos += stats.speed;
+			bush_pos %= (480 - 46)*BUSH_SPEED;
 		}
 		else
 		{
@@ -201,9 +211,13 @@ int main(int argc, char **argv) {
 			switch(event.type) {
 				case SDL_KEYDOWN:
 					if (event.key.keysym.sym == SDLK_ESCAPE) quit = 1;
-					else if (event.key.keysym.sym == SDLK_n) stats.newGame();
+					else if (event.key.keysym.sym == SDLK_n && !stats.isPause) stats.newGame();
 					else if (event.key.keysym.sym == SDLK_p) stats.pause();
-					else if (event.key.keysym.sym == SDLK_s) save(stats);
+					else if (event.key.keysym.sym == SDLK_s) 
+					{ 
+						save(stats);
+						sprintf_s(textInfo, "Game is Saved");
+					}
 					else if (event.key.keysym.sym == SDLK_l) load(&stats);
 					else if (event.key.keysym.sym == SDLK_UP && !stats.isPause) stats.speeding();
 					else if (event.key.keysym.sym == SDLK_DOWN && !stats.isPause) stats.slowing();
@@ -211,7 +225,6 @@ int main(int argc, char **argv) {
 					else if (event.key.keysym.sym == SDLK_LEFT && !stats.isPause) stats.movingToLeft();
 					break;
 				case SDL_KEYUP:
-					etiSpeed = 1.0;
 					break;
 				case SDL_QUIT:
 					quit = 1;

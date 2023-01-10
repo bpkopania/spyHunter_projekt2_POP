@@ -2,26 +2,12 @@
 
 game::game()
 {
-	speed = 0;
-	time = 0;
-	score = 0;
-	position = 0;
-	peanulty = 0;
-	peanulty_start = 0;
-	lives = STARTING_LIVES;
-	isPause = false;
+	game_setter();
 }
 
 void game::newGame()
 {
-	speed = 0;
-	time = 0;
-	score = 0;
-	position = 0;
-	peanulty = 0;
-	peanulty_start = 0;
-	lives = STARTING_LIVES;
-	isPause = false;
+	game_setter();
 }
 
 void game::speeding()
@@ -79,4 +65,16 @@ void game::movingToLeft()
 void game::pause()
 {
 	isPause = !isPause;
+}
+
+void game::game_setter()
+{
+	speed = 0;
+	time = 0;
+	score = 0;
+	position = 0;
+	peanulty = 0;
+	peanulty_start = 0;
+	lives = STARTING_LIVES;
+	isPause = false;
 }
