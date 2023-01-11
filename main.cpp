@@ -16,7 +16,8 @@
 #define SCORE_BY_RIDE 30
 #define CAR_POS_FROM_BOTTOM 30
 
-#define BUSH_SPEED 40
+#define BUSH_SPEED 30
+#define BUSH_NUM 4
 
 long long int scoreByRide(double time, int speed);
 
@@ -25,7 +26,11 @@ int main(int argc, char **argv) {
 	int t1, t2, quit, frames, rc;
 	double delta, fpsTimer, fps;
 
-	int bush_pos = 0;
+	int bush_pos[BUSH_NUM] = { 0,12000,21000,29000 };
+	/*for (int i = 0; i < BUSH_NUM; i++)
+	{
+
+	}*/
 
 	SDL_Event event;
 	SDL_Surface *screen, *charset;
@@ -34,17 +39,6 @@ int main(int argc, char **argv) {
 	SDL_Texture *scrtex;
 	SDL_Window *window;
 	SDL_Renderer *renderer;
-
-	// okno konsoli nie jest widoczne, je¿eli chcemy zobaczyæ
-	// komunikaty wypisywane printf-em trzeba w opcjach:
-	// project -> szablon2 properties -> Linker -> System -> Subsystem
-	// zmieniæ na "Console"
-	// console window is not visible, to see the printf output
-	// the option:
-	// project -> szablon2 properties -> Linker -> System -> Subsystem
-	// must be changed to "Console"
-	/*printf("wyjscie printfa trafia do tego okienka\n");
-	printf("printf output goes here\n");*/
 
 	if(SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 		printf("SDL_Init error: %s\n", SDL_GetError());
@@ -126,6 +120,7 @@ int main(int argc, char **argv) {
 
 	t1 = SDL_GetTicks();
 
+	int timeForInfo = 0;
 	frames = 0;
 	fpsTimer = 0;
 	fps = 0;
@@ -135,19 +130,19 @@ int main(int argc, char **argv) {
 
 	while(!quit) {
 
+		t2 = SDL_GetTicks();
+
+		// w tym momencie t2-t1 to czas w milisekundach,
+		// jaki uplyna³ od ostatniego narysowania ekranu
+		// delta to ten sam czas w sekundach
+		// here t2-t1 is the time in milliseconds since
+		// the last screen was drawn
+		// delta is the same time in seconds
+		delta = (t2 - t1) * 0.001;
+		t1 = t2;
+
 		if (!stats.isPause)
 		{
-			t2 = SDL_GetTicks();
-
-			// w tym momencie t2-t1 to czas w milisekundach,
-			// jaki uplyna³ od ostatniego narysowania ekranu
-			// delta to ten sam czas w sekundach
-			// here t2-t1 is the time in milliseconds since
-			// the last screen was drawn
-			// delta is the same time in seconds
-			delta = (t2 - t1) * 0.001;
-			t1 = t2;
-
 			stats.time += delta;
 
 			SDL_FillRect(screen, NULL, czarny);
@@ -165,14 +160,17 @@ int main(int argc, char **argv) {
 		DrawRectangle(screen, SCREEN_WIDTH/2+ROAD_WIDTH, 56, SCREEN_WIDTH / 2 - ROAD_WIDTH, SCREEN_HEIGHT - 52, zielony, zielony);
 
 		//bush
-		DrawSurface(screen, bush, 60, bush_pos / BUSH_SPEED + 46);
+		DrawSurface(screen, bush, 60, (bush_pos[0] / BUSH_SPEED) + 46);
+		DrawSurface(screen, bush, SCREEN_WIDTH-50, (bush_pos[1] / BUSH_SPEED) + 46);
+		DrawSurface(screen, bush, 130, (bush_pos[2] / BUSH_SPEED) + 46);
+		DrawSurface(screen, bush, SCREEN_WIDTH - 120, (bush_pos[3] / BUSH_SPEED) + 46);
 
 		// tekst informacyjny / info text
 		DrawRectangle(screen, 4, 4, SCREEN_WIDTH - 8, 52, czerwony, niebieski);
 		sprintf_s(text, "Bartosz Kopania 193169 inf gr 4");
 		DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 10, text, charset);
 		// "template for the second project, elapsed time = %.1lf s  %.0lf frames / s"
-		sprintf_s(text, "Wynik: %.10i, speed: %.2ikm/h, czas trwania: %.1lf s  %.0lf klatek / s",stats.score, stats.speed, stats.time, fps);
+		sprintf_s(text, "Wynik: %.10i, speed: %.2ikm/h, czas trwania: %.1lf s  %.0lf klatek / s", stats.score, stats.speed, stats.time, fps);
 		DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 26, text, charset);
 		sprintf_s(text, "Esc - wyjscie, \030 - przyspieszenie, \031 - zwolnienie");
 		DrawString(screen, screen->w / 2 - strlen(text) * 8 / 2, 42, text, charset);
@@ -185,40 +183,58 @@ int main(int argc, char **argv) {
 		DrawSurface(screen, car, SCREEN_WIDTH / 2 + stats.position, SCREEN_HEIGHT - CAR_POS_FROM_BOTTOM - CAR_HEIGHT);
 
 		
+		if (timeForInfo > stats.time)
+		{
+			DrawString(screen, 6, SCREEN_HEIGHT - 26, textInfo, charset);
+		}
 
-		DrawString(screen, 6, SCREEN_HEIGHT - 26, textInfo, charset);
+		if (stats.isGameOver)
+		{
+			sprintf_s(text, "Game Over, Your Score is: %i, time: %.1lf", stats.score, stats.time);
+			DrawString(screen, SCREEN_WIDTH / 2 - strlen(text) * 4, SCREEN_HEIGHT / 2, text, charset);
+		}
 
 		SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
 //		SDL_RenderClear(renderer);
 		SDL_RenderCopy(renderer, scrtex, NULL, NULL);
 		SDL_RenderPresent(renderer);
 
-		if (!stats.isPause)
-		{
-			stats.score += scoreByRide(delta, stats.speed);
-			bush_pos += stats.speed;
-			bush_pos %= (480 - 46)*BUSH_SPEED;
-		}
-		else
-		{
-			sprintf_s(text, "Game is Paused");
-			DrawString(screen, SCREEN_WIDTH/2-strlen(text)*4, SCREEN_HEIGHT/2, text, charset);
-		}
 		
 
-		// obs³uga zdarzeñ (o ile jakieœ zasz³y) / handling of events (if there were any)
+		if (!stats.isPause)
+		{
+			if(stats.time>=stats.peanulty) stats.score += scoreByRide(delta, stats.speed);
+			for (int i = 0; i < BUSH_NUM; i++)
+			{
+				bush_pos[i] += stats.speed;
+				bush_pos[i] %= (SCREEN_HEIGHT - 46) * BUSH_SPEED;
+			}
+		}
+		else if(!stats.isGameOver)
+		{
+			sprintf_s(text, "Game is Paused");
+			DrawString(screen, SCREEN_WIDTH / 2 - strlen(text) * 4, SCREEN_HEIGHT / 2, text, charset);
+		}
+
+		//handling of events (if there were any)
 		while(SDL_PollEvent(&event)) {
 			switch(event.type) {
 				case SDL_KEYDOWN:
 					if (event.key.keysym.sym == SDLK_ESCAPE) quit = 1;
 					else if (event.key.keysym.sym == SDLK_n && !stats.isPause) stats.newGame();
-					else if (event.key.keysym.sym == SDLK_p) stats.pause();
-					else if (event.key.keysym.sym == SDLK_s) 
+					else if (event.key.keysym.sym == SDLK_p && !stats.isGameOver) stats.pause();
+					else if (event.key.keysym.sym == SDLK_s && !stats.isGameOver)
 					{ 
 						save(stats);
 						sprintf_s(textInfo, "Game is Saved");
+						timeForInfo = stats.time + 5;
 					}
-					else if (event.key.keysym.sym == SDLK_l) load(&stats);
+					else if (event.key.keysym.sym == SDLK_l)
+					{
+						load(&stats);
+						sprintf_s(textInfo, "Game is Loaded");
+						timeForInfo = stats.time + 5;
+					}
 					else if (event.key.keysym.sym == SDLK_UP && !stats.isPause) stats.speeding();
 					else if (event.key.keysym.sym == SDLK_DOWN && !stats.isPause) stats.slowing();
 					else if (event.key.keysym.sym == SDLK_RIGHT && !stats.isPause) stats.movingToRight();
@@ -234,7 +250,7 @@ int main(int argc, char **argv) {
 		frames++;
 	};
 
-	// zwolnienie powierzchni / freeing all surfaces
+	//freeing all surfaces
 	SDL_FreeSurface(charset);
 	SDL_FreeSurface(screen);
 	SDL_DestroyTexture(scrtex);

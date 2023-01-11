@@ -1,1 +1,1 @@
-speed: 45 time: 26.722000 score: 23264 position: 0 peanulty: 0 0 lives: 3
+speed: 24 time: 4.631000 score: 1201 position: -68 peanulty: 0.000000 0 lives: 3

@@ -2,6 +2,7 @@
 
 game::game()
 {
+	isPause = false;
 	game_setter();
 }
 
@@ -35,6 +36,7 @@ void game::movingToRight()
 		}
 		else
 		{
+			liveDown();
 			//TODO
 			//GAME OVER
 			//position = 0;
@@ -55,6 +57,7 @@ void game::movingToLeft()
 		}
 		else
 		{
+			liveDown();
 			//TODO
 			//GAME OVER
 			//position = 0;
@@ -69,6 +72,7 @@ void game::pause()
 
 void game::game_setter()
 {
+	isGameOver = false;
 	speed = 0;
 	time = 0;
 	score = 0;
@@ -77,4 +81,28 @@ void game::game_setter()
 	peanulty_start = 0;
 	lives = STARTING_LIVES;
 	isPause = false;
+}
+
+void game::liveDown()
+{
+	if (time > GOD_MODE_TIME)
+	{
+		lives--;
+	}
+	if (lives < 0)
+	{
+		gameOver();
+	}
+	else
+	{
+		speed = 0;
+		position = 0;
+		peanulty = time + PEANULTY_TIME;
+	}
+}
+
+void game::gameOver()
+{
+	isPause = true;
+	isGameOver = true;
 }
