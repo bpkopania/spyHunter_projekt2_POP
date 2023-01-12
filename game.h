@@ -13,6 +13,8 @@
 #define MAX_SPEED 45
 #define TURN_SPEED 4
 
+#define BASIC_DISTANCE 100
+
 class game
 {
 public:
@@ -25,6 +27,11 @@ public:
 	int lives;
 	bool isPause;
 	bool isGameOver;
+	int newCars;
+	struct _gun {
+		int ammo;
+		int distance;
+	} gun;
 	
 	game();
 

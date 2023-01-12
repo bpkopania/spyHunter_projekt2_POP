@@ -37,9 +37,6 @@ void game::movingToRight()
 		else
 		{
 			liveDown();
-			//TODO
-			//GAME OVER
-			//position = 0;
 		}
 	}
 }
@@ -58,9 +55,6 @@ void game::movingToLeft()
 		else
 		{
 			liveDown();
-			//TODO
-			//GAME OVER
-			//position = 0;
 		}
 	}
 }
@@ -72,6 +66,9 @@ void game::pause()
 
 void game::game_setter()
 {
+	gun.ammo = -1;
+	gun.distance = BASIC_DISTANCE;
+	newCars = 0;
 	isGameOver = false;
 	speed = 0;
 	time = 0;

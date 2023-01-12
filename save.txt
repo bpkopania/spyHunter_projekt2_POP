@@ -1,1 +1,0 @@
-speed: 24 time: 4.631000 score: 1201 position: -68 peanulty: 0.000000 0 lives: 3

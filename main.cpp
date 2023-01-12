@@ -177,7 +177,7 @@ int main(int argc, char **argv) {
 
 		//display funcionalities
 		DrawRectangle(screen, SCREEN_WIDTH-260, SCREEN_HEIGHT - 36, 250, 26, czerwony, niebieski);
-		sprintf_s(text, "abcdefg");
+		sprintf_s(text, "abcdefgg im");
 		DrawString(screen, SCREEN_WIDTH-250, SCREEN_HEIGHT - 26, text, charset);
 
 		DrawSurface(screen, car, SCREEN_WIDTH / 2 + stats.position, SCREEN_HEIGHT - CAR_POS_FROM_BOTTOM - CAR_HEIGHT);
@@ -225,14 +225,26 @@ int main(int argc, char **argv) {
 					else if (event.key.keysym.sym == SDLK_p && !stats.isGameOver) stats.pause();
 					else if (event.key.keysym.sym == SDLK_s && !stats.isGameOver)
 					{ 
-						save(stats);
-						sprintf_s(textInfo, "Game is Saved");
+						if (save(stats))
+						{
+							sprintf_s(textInfo, "Game is Saved");
+						}
+						else
+						{
+							sprintf_s(textInfo, "Saving Failed!!!");
+						}
 						timeForInfo = stats.time + 5;
 					}
 					else if (event.key.keysym.sym == SDLK_l)
 					{
-						load(&stats);
-						sprintf_s(textInfo, "Game is Loaded");
+						if (load(&stats))
+						{
+							sprintf_s(textInfo, "Game is Loaded");
+						}
+						else
+						{
+							sprintf_s(textInfo, "Loading failed");
+						}
 						timeForInfo = stats.time + 5;
 					}
 					else if (event.key.keysym.sym == SDLK_UP && !stats.isPause) stats.speeding();
