@@ -118,6 +118,8 @@ int main(int argc, char **argv) {
 			};
 		}
 
+		stats.newCar();
+
 		SDL_FillRect(screen.screen, NULL, czarny);
 
 		//road
