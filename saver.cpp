@@ -3,6 +3,21 @@
 #include <string.h>
 
 #include "game.h"
+#include "SDL_handler.h"
+
+#include "config.h"
+
+void move_up(int* pos)
+{
+	if (*pos > 0)
+		(*pos)--;
+}
+
+void move_down(int* pos, int n)
+{
+	if (*pos < n - 1)
+		(*pos)++;
+}
 
 bool save(game stats)
 {
@@ -61,9 +76,25 @@ bool save(game stats)
 	
 }
 
-bool load(game *stats)
+bool load(game* stats, char* name)
 {
 	FILE* save;
+
+	fopen_s(&save, name, "r");
+	if (save != NULL)
+	{
+		fscanf_s(save, "speed: %i time: %lf score: %lli position: %i peanulty: %lf %i lives: %i new_cars: %i ammo: %i",
+			&(stats->speed), &(stats->time), &(stats->score), &(stats->position), &(stats->peanulty), &(stats->peanulty_start), &(stats->lives), &(stats->newCars), &(stats->gun.ammo));
+
+		stats->isPause = true;
+		fclose(save);
+		return true;
+	}
+	return false;
+}
+
+bool name_getter(game *stats, _screen screen)
+{
 	FILE* number;
 	FILE* names;
 
@@ -90,16 +121,49 @@ bool load(game *stats)
 			}
 			fclose(names);
 
-			fopen_s(&save, nameOfFiles[0], "r");
-			if (save != NULL)
-			{
-				fscanf_s(save, "speed: %i time: %lf score: %lli position: %i peanulty: %lf %i lives: %i new_cars: %i ammo: %i",
-					&(stats->speed), &(stats->time), &(stats->score), &(stats->position), &(stats->peanulty), &(stats->peanulty_start), &(stats->lives), &(stats->newCars), &(stats->gun.ammo));
+			int pos = 0;
+			bool choosen = false;
+			const int czarny = SDL_MapRGB(screen.screen->format, 0x00, 0x00, 0x00);
+			//const int zielony = SDL_MapRGB(screen.screen->format, 0x00, 0x99, 0x00);
+			char text[128];
 
-				stats->isPause = true;
-				fclose(save);
-				return true;
+			while (!choosen)
+			{
+				SDL_FillRect(screen.screen, NULL, czarny);
+				//DrawRectangle(screen.screen, SCREEN_WIDTH / 2 + ROAD_WIDTH, 56, SCREEN_WIDTH / 2 - ROAD_WIDTH, SCREEN_HEIGHT - 52, zielony, zielony);
+
+				for (int i = 0; i < numberOfFiles; i++)
+				{
+					sprintf_s(text, "%s",nameOfFiles[i]);
+					DrawString(screen.screen, screen.screen->w / 2 - strlen(text) * 8 / 2, i*26+10, text, screen.charset);
+				}
+
+				DrawSurface(screen.screen, screen.arrow, SCREEN_WIDTH/2-120, pos*26+10);
+
+				SDL_UpdateTexture(screen.scrtex, NULL, screen.screen->pixels, screen.screen->pitch);
+				SDL_RenderCopy(screen.renderer, screen.scrtex, NULL, NULL);
+				SDL_RenderPresent(screen.renderer);
+
+				while (SDL_PollEvent(&(screen.event))) {
+					switch (screen.event.type) {
+					case SDL_KEYDOWN:
+						if (screen.event.key.keysym.sym == SDLK_ESCAPE) choosen = true;
+						else if (screen.event.key.keysym.sym == SDLK_RETURN) choosen = true;
+						else if (screen.event.key.keysym.sym == SDLK_UP) move_up(&pos);
+						else if (screen.event.key.keysym.sym == SDLK_DOWN) move_down(&pos, numberOfFiles);
+						break;
+					case SDL_KEYUP:
+						break;
+					case SDL_QUIT:
+						choosen = true;
+						break;
+					}
+				}
+				SDL_RenderClear(screen.renderer);
 			}
+
+			if (load(stats, nameOfFiles[pos]))
+				return true;
 		}
 	}	
 	

@@ -4,10 +4,8 @@
 #include<string.h>
 #include "SDL_handler.h"
 
-extern "C" {
 #include"SDL2-2.0.10/include/SDL.h"
 #include"SDL2-2.0.10/include/SDL_main.h"
-}
 
 // narysowanie napisu txt na powierzchni screen, zaczynaj¹c od punktu (x, y)
 // charset to bitmapa 128x128 zawieraj¹ca znaki
@@ -83,3 +81,14 @@ void DrawRectangle(SDL_Surface* screen, int x, int y, int l, int k,
 	for (i = y + 1; i < y + k - 1; i++)
 		DrawLine(screen, x + 1, i, l - 2, 1, 0, fillColor);
 };
+
+void on_exit(_screen* screen)
+{
+	//free all surfaces
+	printf("SDL_LoadBMP(cs8x8.bmp) error: %s\n", SDL_GetError());
+	SDL_FreeSurface(screen->screen);
+	SDL_DestroyTexture(screen->scrtex);
+	SDL_DestroyWindow(screen->window);
+	SDL_DestroyRenderer(screen->renderer);
+	SDL_Quit();
+}

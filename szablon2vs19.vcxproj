@@ -30,6 +30,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game.h" />
+    <ClInclude Include="config.h" />
     <ClInclude Include="saver.h" />
     <ClInclude Include="SDL_handler.h" />
   </ItemGroup>
