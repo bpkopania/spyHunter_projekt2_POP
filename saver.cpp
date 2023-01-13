@@ -16,9 +16,9 @@ bool save(game stats)
 
 	time_t _time = time(NULL);
 	tm __time = *localtime(&_time);
-	strftime(nameOfFile, sizeof(nameOfFile), "%Y %m %d %H %M %S.txt", &__time);
+	strftime(nameOfFile, sizeof(nameOfFile), "%Y-%m-%d_%H_%M_%S.txt", &__time);
 
-	//readind the number of files
+	//reading the number of files
 	fopen_s(&number, "num.txt", "r");
 	if (number != NULL)
 	{
@@ -40,10 +40,6 @@ bool save(game stats)
 		if (save != NULL)
 		{
 			//increasing the files Number
-			//if (fscanf_s(number, "%i", &numberOfFiles) == EOF)
-				//numberOfFiles = 0;
-			//else
-				//fscanf_s(number, "%i", &numberOfFiles);
 			numberOfFiles++;
 			fprintf_s(number, "%i", numberOfFiles);
 
@@ -73,28 +69,39 @@ bool load(game *stats)
 
 	int numberOfFiles;
 
-	char nameOfFile[51];
+	char str[26];
 
 	fopen_s(&number, "num.txt", "r");
 	if (number != NULL)
 	{
 		fscanf_s(number, "%i", &numberOfFiles);
 		fclose(number);
-	}
-	else
-	{
-		return false;
-	}
+		char** nameOfFiles;
+		nameOfFiles = new char* [numberOfFiles];
 
-	fopen_s(&save, "save.txt", "r");
-	if (save != NULL)
-	{
-		fscanf_s(save, "speed: %i time: %lf score: %lli position: %i peanulty: %lf %i lives: %i new_cars: %i ammo: %i",
-			&(stats->speed), &(stats->time), &(stats->score), &(stats->position), &(stats->peanulty), &(stats->peanulty_start), &(stats->lives), &(stats->newCars), &(stats->gun.ammo));
+		fopen_s(&names, "names.txt", "r");
+		if (names != NULL)
+		{
+			for (int i = 0; i < numberOfFiles; i++)
+			{
+				nameOfFiles[i] = new char[51];
+				//fscanf_s(names, "%s", nameOfFiles[i]);
+				fscanf(names, "%s", nameOfFiles[i]);
+			}
+			fclose(names);
 
-		stats->isPause = true;
-		fclose(save);
-		return true;
-	}
+			fopen_s(&save, nameOfFiles[0], "r");
+			if (save != NULL)
+			{
+				fscanf_s(save, "speed: %i time: %lf score: %lli position: %i peanulty: %lf %i lives: %i new_cars: %i ammo: %i",
+					&(stats->speed), &(stats->time), &(stats->score), &(stats->position), &(stats->peanulty), &(stats->peanulty_start), &(stats->lives), &(stats->newCars), &(stats->gun.ammo));
+
+				stats->isPause = true;
+				fclose(save);
+				return true;
+			}
+		}
+	}	
+	
 	return false;
 }
