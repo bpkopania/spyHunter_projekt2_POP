@@ -75,7 +75,7 @@ void game::game_setter()
 	score = 0;
 	position = 0;
 	peanulty = 0;
-	peanulty_start = 0;
+	//peanulty_start = 0;
 	lives = STARTING_LIVES;
 	isPause = false;
 }

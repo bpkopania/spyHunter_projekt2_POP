@@ -4,6 +4,7 @@
 #include "SDL_handler.h"
 #include "game.h"
 #include "saver.h"
+#include "highScore.h"
 
 #include "config.h"
 
@@ -187,6 +188,15 @@ int main(int argc, char **argv) {
 					if (screen.event.key.keysym.sym == SDLK_ESCAPE) quit = 1;
 					else if (screen.event.key.keysym.sym == SDLK_n && !stats.isPause) stats.newGame();
 					else if (screen.event.key.keysym.sym == SDLK_p && !stats.isGameOver) stats.pause();
+					else if (screen.event.key.keysym.sym == SDLK_h)
+					{
+						stats.pause();
+						/*if (!showScore(screen, 's'))
+						{
+							sprintf_s(textInfo, "No highScores curently!!!");
+						}*/
+						stats.pause();
+					}
 					else if (screen.event.key.keysym.sym == SDLK_s && !stats.isGameOver)
 					{ 
 						if (save(stats))
@@ -207,7 +217,7 @@ int main(int argc, char **argv) {
 						}
 						else
 						{
-							sprintf_s(textInfo, "Loading failed");
+							sprintf_s(textInfo, "Loading failed!!!");
 						}
 						timeForInfo = stats.time + 5;
 					}

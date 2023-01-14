@@ -123,7 +123,6 @@ bool name_getter(game *stats, _screen screen)
 			for (int i = 0; i < numberOfFiles; i++)
 			{
 				nameOfFiles[i] = new char[51];
-				//fscanf_s(names, "%s", nameOfFiles[i]);
 				fscanf(names, "%s", nameOfFiles[i]);
 			}
 			fclose(names);
