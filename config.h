@@ -1,3 +1,5 @@
+#pragma once
+
 #define SCREEN_WIDTH	640
 #define SCREEN_HEIGHT	480
 
@@ -6,3 +8,5 @@
 
 #define BUSH_SPEED 30
 #define BUSH_NUM 4
+
+#define MAXCARS 3

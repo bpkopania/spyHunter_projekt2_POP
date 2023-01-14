@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="highScore.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="saver.cpp" />
     <ClCompile Include="SDL_handler.cpp" />
@@ -31,6 +32,7 @@
   <ItemGroup>
     <ClInclude Include="game.h" />
     <ClInclude Include="config.h" />
+    <ClInclude Include="highScore.h" />
     <ClInclude Include="saver.h" />
     <ClInclude Include="SDL_handler.h" />
   </ItemGroup>

@@ -75,7 +75,7 @@ void game::game_setter()
 	score = 0;
 	position = 0;
 	peanulty = 0;
-	peanulty_start = 0;
+	//peanulty_start = 0;
 	lives = STARTING_LIVES;
 	isPause = false;
 }
@@ -102,4 +102,28 @@ void game::gameOver()
 {
 	isPause = true;
 	isGameOver = true;
+}
+
+void game::newCar()
+{
+	if (score > AWARD && newCars < 1)
+	{
+		lives++;
+		newCars++;
+	}
+	else if (score > 2 * AWARD && newCars < 2)
+	{
+		lives++;
+		newCars++;
+	}
+	else if (score > 3 * AWARD && newCars < 3)
+	{
+		lives++;
+		newCars++;
+	}
+}
+
+void game::shooting()
+{
+
 }
