@@ -4,6 +4,7 @@
 
 #include "game.h"
 #include "SDL_handler.h"
+#include "saver.h"
 
 #include "config.h"
 

@@ -8,10 +8,9 @@
 
 #include "config.h"
 
-#include"SDL2-2.0.10/include/SDL.h"
-#include"SDL2-2.0.10/include/SDL_main.h"
-
 long long int scoreByRide(double time, int speed);
+
+void onFinish(_screen screen, game stats);
 
 // main
 int main(int argc, char **argv) {
@@ -145,7 +144,7 @@ int main(int argc, char **argv) {
 
 		//display funcionalities
 		DrawRectangle(screen.screen, SCREEN_WIDTH-260, SCREEN_HEIGHT - 36, 250, 26, czerwony, niebieski);
-		sprintf_s(text, "abcdefgg im");
+		sprintf_s(text, "abcdefgg i m o");
 		DrawString(screen.screen, SCREEN_WIDTH-250, SCREEN_HEIGHT - 26, text, screen.charset);
 
 		DrawSurface(screen.screen, screen.car, SCREEN_WIDTH / 2 + stats.position, SCREEN_HEIGHT - CAR_POS_FROM_BOTTOM - CAR_HEIGHT);
@@ -185,17 +184,26 @@ int main(int argc, char **argv) {
 		while(SDL_PollEvent(&(screen.event))) {
 			switch(screen.event.type) {
 				case SDL_KEYDOWN:
-					if (screen.event.key.keysym.sym == SDLK_ESCAPE) quit = 1;
-					else if (screen.event.key.keysym.sym == SDLK_n && !stats.isPause) stats.newGame();
+					if (screen.event.key.keysym.sym == SDLK_ESCAPE) 
+					{
+						onFinish(screen, stats);
+						quit = 1;
+					}
+					else if (screen.event.key.keysym.sym == SDLK_n && !stats.isPause)
+					{
+						onFinish(screen, stats);
+						stats.newGame();
+					}
 					else if (screen.event.key.keysym.sym == SDLK_p && !stats.isGameOver) stats.pause();
 					else if (screen.event.key.keysym.sym == SDLK_h)
 					{
 						stats.pause();
-						/*if (!showScore(screen, 's'))
+						char mode = modePicker(screen);
+						if (!showScore(mode, screen))
 						{
 							sprintf_s(textInfo, "No highScores curently!!!");
-						}*/
-						stats.pause();
+							timeForInfo = stats.time + 5;
+						}
 					}
 					else if (screen.event.key.keysym.sym == SDLK_s && !stats.isGameOver)
 					{ 
@@ -243,4 +251,39 @@ int main(int argc, char **argv) {
 long long int scoreByRide(double time, int speed)
 {
 	return SCORE_BY_RIDE * time * speed;
+}
+
+void onFinish(_screen screen, game stats)
+{
+	char text[128];
+	bool end = false;
+	const int czarny = SDL_MapRGB(screen.screen->format, 0x00, 0x00, 0x00);
+	while (!end)
+	{
+		SDL_FillRect(screen.screen, NULL, czarny);
+
+		sprintf_s(text, "Press enter to save your score");
+		DrawString(screen.screen, screen.screen->w / 2 - strlen(text) * 8 / 2, 36, text, screen.charset);
+		sprintf_s(text, "Press escape to abbandon your score");
+		DrawString(screen.screen, screen.screen->w / 2 - strlen(text) * 8 / 2, 72, text, screen.charset);
+
+		SDL_UpdateTexture(screen.scrtex, NULL, screen.screen->pixels, screen.screen->pitch);
+		SDL_RenderCopy(screen.renderer, screen.scrtex, NULL, NULL);
+		SDL_RenderPresent(screen.renderer);
+
+		while (SDL_PollEvent(&(screen.event))) {
+			switch (screen.event.type) {
+			case SDL_KEYDOWN:
+				if (screen.event.key.keysym.sym == SDLK_ESCAPE) end = true;
+				else if (screen.event.key.keysym.sym == SDLK_RETURN) { addScore(stats.score, stats.time); end = true; }
+				break;
+			case SDL_KEYUP:
+				break;
+			case SDL_QUIT:
+				end = true;
+				break;
+			}
+		}
+		SDL_RenderClear(screen.renderer);
+	}
 }

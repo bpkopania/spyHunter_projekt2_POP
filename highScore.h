@@ -1,3 +1,7 @@
+#pragma once
+
+#include "SDL_handler.h"
+
 #define MAX_SIZE_HIGHSCORE 10
 
 struct _score {
@@ -7,8 +11,10 @@ struct _score {
 
 void addScore(long long int scoreToSave, double timeToSave);
 
-//bool showScore(_screen screen, char mode);
+bool showScore(char mode, _screen screen);
 
 void orderByTime(_score ordered[]);
 
 void orderByScore(_score ordered[]);
+
+char modePicker(_screen screen);
