@@ -8,6 +8,8 @@ struct _screen
 	SDL_Event event;
 	SDL_Surface* screen, * charset;
 	SDL_Surface* car;
+	SDL_Surface* Enemycar;
+	SDL_Surface* Neutralcar;
 	SDL_Surface* bush;
 	SDL_Surface* arrow;
 	SDL_Texture* scrtex;

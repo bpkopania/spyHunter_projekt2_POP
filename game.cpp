@@ -1,3 +1,6 @@
+#include <time.h>
+#include <stdlib.h>
+
 #include "game.h"
 
 game::game()
@@ -71,18 +74,22 @@ void game::game_setter()
 	newCars = 0;
 	isGameOver = false;
 	speed = 0;
-	time = 0;
+	wtime = 0;
 	score = 0;
 	position = 0;
 	peanulty = 0;
 	//peanulty_start = 0;
 	lives = STARTING_LIVES;
 	isPause = false;
+	for (int i = 0; i < MAXCARS; i++)
+	{
+		cars[i].speed = -1;
+	}
 }
 
 void game::liveDown()
 {
-	if (time > GOD_MODE_TIME)
+	if (wtime > GOD_MODE_TIME)
 	{
 		lives--;
 	}
@@ -94,7 +101,7 @@ void game::liveDown()
 	{
 		speed = 0;
 		position = 0;
-		peanulty = time + PEANULTY_TIME;
+		peanulty = wtime + PEANULTY_TIME;
 	}
 }
 
@@ -123,7 +130,67 @@ void game::newCar()
 	}
 }
 
+void game::otherCarsHandler()
+{
+	if (wtime > NO_ENEMY_TIME)
+	{
+		int probability;
+		for (int i = 0; i < MAXCARS; i++)
+		{
+			if (cars[i].speed == -1)
+			{
+				probability = rand() % NEW_CAR_PROB;
+				if (probability == 0)
+					setNewCar(i);
+			}
+
+			cars[i].position.y -= cars[i].speed - speed;
+
+			if (cars[i].position.y > (SCREEN_HEIGHT + CAR_HEIGHT + CAR_HEIGHT)*BUSH_SPEED  || cars[i].position.y < 0 - CAR_HEIGHT)
+			{
+				cars[i].speed = -1;
+			}
+
+		}
+	}
+}
+
+void game::setNewCar(int index)
+{
+	//srand(time(NULL));
+	cars[index].speed = rand() % (MAX_SPEED_ENEMY - 10) + 10;
+	cars[index].position.x = rand() % ((ROAD_WIDTH - CAR_WIDTH)* 2) - ROAD_WIDTH + CAR_WIDTH;
+	cars[index].attitiude = rand() % 2;
+	if (cars[index].speed > speed)
+	{
+		cars[index].position.y = (SCREEN_HEIGHT + CAR_HEIGHT / 2) * BUSH_SPEED;
+	}
+	else
+	{
+		cars[index].position.y = 0;
+	}
+}
+
 void game::shooting()
 {
-
+	for (int i = 0; i < MAXCARS; i++)
+	{
+		int range = 480 - CAR_POS_FROM_BOTTOM - CAR_HEIGHT / 2 - gun.distance;
+		range *= BUSH_SPEED;
+		if (cars[i].position.x > position - 2 * CAR_WIDTH
+			&& cars[i].position.x < position + 2 * CAR_WIDTH
+			&& cars[i].position.y > range
+			&& cars[i].position.y/BUSH_SPEED < SCREEN_HEIGHT - CAR_POS_FROM_BOTTOM - CAR_HEIGHT)
+		{
+			if (cars[i].attitiude == 1)
+			{
+				score += AWARD;
+			}
+			else
+			{
+				peanulty = wtime + PEANULTY_TIME;
+			}
+			cars[i].speed = -1;
+		}
+	}
 }

@@ -9,4 +9,4 @@
 #define BUSH_SPEED 30
 #define BUSH_NUM 4
 
-#define MAXCARS 3
+#define MAXCARS 4
