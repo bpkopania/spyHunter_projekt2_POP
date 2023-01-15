@@ -186,7 +186,7 @@ int main(int argc, char **argv) {
 		DrawString(screen.screen, screen.screen->w / 2 - strlen(text) * 8 / 2, 42, text, screen.charset);
 
 		//display funcionalities
-		sprintf_s(text, "abcdefgg i klm o");
+		sprintf_s(text, "abcdefgg i klmno");
 		DrawRectangle(screen.screen, SCREEN_WIDTH - strlen(text) * 8 - 30, SCREEN_HEIGHT - 36, strlen(text)*8 + 20, 26, czerwony, niebieski);
 		DrawString(screen.screen, SCREEN_WIDTH-strlen(text) * 8 - 20, SCREEN_HEIGHT - 26, text, screen.charset);
 
