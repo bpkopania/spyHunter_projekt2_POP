@@ -136,8 +136,7 @@ int main(int argc, char **argv) {
 			};
 		}
 
-		stats.newCar();
-		stats.otherCarsHandler();
+		
 
 		SDL_FillRect(screen.screen, NULL, czarny);
 
@@ -150,7 +149,7 @@ int main(int argc, char **argv) {
 		{
 			if (stats.cars[i].speed > 0)
 			{
-				if (stats.cars[i].attitiude == 1)
+				if (stats.cars[i].attitiude == ENEMY_CODE)
 				{
 					DrawSurface(screen.screen, screen.Enemycar, SCREEN_WIDTH / 2 + stats.cars[i].position.x, stats.cars[i].position.y / BUSH_SPEED);
 				}
@@ -198,6 +197,8 @@ int main(int argc, char **argv) {
 
 		if (!stats.isPause)
 		{
+			stats.newCar();
+			stats.otherCarsHandler();
 			if (stats.wtime >= stats.peanulty) stats.score += scoreByRide(delta, stats.speed);
 			for (int i = 0; i < BUSH_NUM; i++)
 			{

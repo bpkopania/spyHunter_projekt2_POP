@@ -26,6 +26,7 @@
 #define MAX_SPEED_ENEMY 60
 
 #define ENEMY_DOWN 1000
+#define ENEMY_CODE 1
 
 class game
 {
@@ -82,5 +83,7 @@ private:
 	void gameOver();
 
 	void setNewCar(int index);
+
+	void touching(int index);
 };
 

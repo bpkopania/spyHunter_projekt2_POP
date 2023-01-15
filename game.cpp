@@ -151,6 +151,7 @@ void game::otherCarsHandler()
 				cars[i].speed = -1;
 			}
 
+			touching(i);
 		}
 	}
 }
@@ -177,12 +178,12 @@ void game::shooting()
 	{
 		int range = 480 - CAR_POS_FROM_BOTTOM - CAR_HEIGHT / 2 - gun.distance;
 		range *= BUSH_SPEED;
-		if (cars[i].position.x > position - 2 * CAR_WIDTH
-			&& cars[i].position.x < position + 2 * CAR_WIDTH
+		if (cars[i].position.x > position - CAR_WIDTH
+			&& cars[i].position.x < position + CAR_WIDTH
 			&& cars[i].position.y > range
 			&& cars[i].position.y/BUSH_SPEED < SCREEN_HEIGHT - CAR_POS_FROM_BOTTOM - CAR_HEIGHT)
 		{
-			if (cars[i].attitiude == 1)
+			if (cars[i].attitiude == ENEMY_CODE)
 			{
 				score += AWARD;
 			}
@@ -191,6 +192,39 @@ void game::shooting()
 				peanulty = wtime + PEANULTY_TIME;
 			}
 			cars[i].speed = -1;
+		}
+	}
+}
+
+void game::touching(int index)
+{
+	if (cars[index].speed != -1 && cars[index].position.x > position - 1.5*CAR_WIDTH
+		&& cars[index].position.x < position + 1.5 * CAR_WIDTH)
+	{
+		if (cars[index].position.y/BUSH_SPEED >= SCREEN_HEIGHT - CAR_POS_FROM_BOTTOM
+			&& cars[index].position.y / BUSH_SPEED <= SCREEN_HEIGHT - CAR_POS_FROM_BOTTOM)
+		{
+			if (cars[index].attitiude == ENEMY_CODE)
+			{
+				score += AWARD;
+			}
+			else
+			{
+				peanulty = wtime + PEANULTY_TIME;
+			}
+			cars[index].speed = -1;
+		}
+		else if (cars[index].position.y / BUSH_SPEED >= SCREEN_HEIGHT - CAR_POS_FROM_BOTTOM - 2 * CAR_HEIGHT
+			&& cars[index].position.y / BUSH_SPEED <= SCREEN_HEIGHT - CAR_POS_FROM_BOTTOM - 2 * CAR_HEIGHT)
+		{
+			if (cars[index].attitiude == ENEMY_CODE)
+			{
+				liveDown();
+			}
+			else
+			{
+				speed = cars[index].speed;
+			}
 		}
 	}
 }
