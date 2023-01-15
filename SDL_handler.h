@@ -12,6 +12,7 @@ struct _screen
 	SDL_Surface* Neutralcar;
 	SDL_Surface* bush;
 	SDL_Surface* arrow;
+	SDL_Surface* plus;
 	SDL_Texture* scrtex;
 	SDL_Window* window;
 	SDL_Renderer* renderer;

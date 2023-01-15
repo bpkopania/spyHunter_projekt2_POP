@@ -64,35 +64,42 @@ int main(int argc, char **argv) {
 
 	screen.car = SDL_LoadBMP("./car.bmp");
 	if(screen.car == NULL) {
-		printf("SDL_LoadBMP(eti.bmp) error: %s\n", SDL_GetError());
+		printf("SDL_LoadBMP(car.bmp) error: %s\n", SDL_GetError());
 		on_exit(&screen);
 		return 1;
 	}
 
 	screen.Enemycar = SDL_LoadBMP("./enemy.bmp");
-	if (screen.car == NULL) {
-		printf("SDL_LoadBMP(eti.bmp) error: %s\n", SDL_GetError());
+	if (screen.Enemycar == NULL) {
+		printf("SDL_LoadBMP(enemy.bmp) error: %s\n", SDL_GetError());
 		on_exit(&screen);
 		return 1;
 	}
 
 	screen.Neutralcar = SDL_LoadBMP("./neutral.bmp");
-	if (screen.car == NULL) {
-		printf("SDL_LoadBMP(eti.bmp) error: %s\n", SDL_GetError());
+	if (screen.Neutralcar == NULL) {
+		printf("SDL_LoadBMP(neutral.bmp) error: %s\n", SDL_GetError());
+		on_exit(&screen);
+		return 1;
+	}
+
+	screen.plus = SDL_LoadBMP("./plus.bmp");
+	if (screen.plus == NULL) {
+		printf("SDL_LoadBMP(plus.bmp) error: %s\n", SDL_GetError());
 		on_exit(&screen);
 		return 1;
 	}
 
 	screen.bush = SDL_LoadBMP("./bush.bmp");
 	if (screen.bush == NULL) {
-		printf("SDL_LoadBMP(eti.bmp) error: %s\n", SDL_GetError());
+		printf("SDL_LoadBMP(bush.bmp) error: %s\n", SDL_GetError());
 		on_exit(&screen);
 		return 1;
 	};
 
 	screen.arrow = SDL_LoadBMP("./arrow.bmp");
 	if (screen.arrow == NULL) {
-		printf("SDL_LoadBMP(eti.bmp) error: %s\n", SDL_GetError());
+		printf("SDL_LoadBMP(arrow.bmp) error: %s\n", SDL_GetError());
 		on_exit(&screen);
 		return 1;
 	}
@@ -160,6 +167,8 @@ int main(int argc, char **argv) {
 			}
 		}
 
+		DrawSurface(screen.screen, screen.plus, SCREEN_WIDTH / 2 + stats.powerUp.position.x, stats.powerUp.position.y/BUSH_SPEED);
+
 		//bush
 		DrawSurface(screen.screen, screen.bush, 60, (bush_pos[0] / BUSH_SPEED) + 46);
 		DrawSurface(screen.screen, screen.bush, SCREEN_WIDTH - 50, (bush_pos[1] / BUSH_SPEED) + 46);
@@ -177,7 +186,7 @@ int main(int argc, char **argv) {
 		DrawString(screen.screen, screen.screen->w / 2 - strlen(text) * 8 / 2, 42, text, screen.charset);
 
 		//display funcionalities
-		sprintf_s(text, "abcdefgg i k m o");
+		sprintf_s(text, "abcdefgg i klm o");
 		DrawRectangle(screen.screen, SCREEN_WIDTH - strlen(text) * 8 - 30, SCREEN_HEIGHT - 36, strlen(text)*8 + 20, 26, czerwony, niebieski);
 		DrawString(screen.screen, SCREEN_WIDTH-strlen(text) * 8 - 20, SCREEN_HEIGHT - 26, text, screen.charset);
 
@@ -199,6 +208,7 @@ int main(int argc, char **argv) {
 		{
 			stats.newCar();
 			stats.otherCarsHandler();
+			stats.powerUpHandler();
 			if (stats.wtime >= stats.peanulty) stats.score += scoreByRide(delta, stats.speed);
 			for (int i = 0; i < BUSH_NUM; i++)
 			{
