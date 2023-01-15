@@ -62,14 +62,15 @@ bool save(game stats)
 			fprintf_s(names, "%s\n", nameOfFile);
 
 			//saving info about game
-			fprintf_s(save, "speed: %i time: %lf score: %lli position: %i peanulty: %lf lives: %i new_cars: %i gun: %i %i",
-				stats.speed, stats.time, stats.score, stats.position, stats.peanulty, stats.lives, stats.newCars, stats.gun.ammo, stats.gun.distance);
+			fprintf_s(save, "speed: %i time: %lf score: %lli position: %i peanulty: %lf lives: %i new_cars: %i gun: %i %i ",
+				stats.speed, stats.wtime, stats.score, stats.position, stats.peanulty, stats.lives, stats.newCars, stats.gun.ammo, stats.gun.distance);
 			
 			fprintf_s(save, "otherCars:\n");
 			for (int i = 0; i < MAXCARS; i++)
 			{
-				fprintf_s(save, "speed: %i, attitiude: %i, pos: %i %i", stats.cars[i].speed, stats.cars[i].attitiude, stats.cars[i].position.x, stats.cars[i].position.y);
+				fprintf_s(save, "speed: %i, attitiude: %i, pos: %i %i ", stats.cars[i].speed, stats.cars[i].attitiude, stats.cars[i].position.x, stats.cars[i].position.y);
 			}
+			fprintf_s(save, "powerUP: %i %i ",stats.powerUp.position.x, stats.powerUp.position.y);
 
 			fclose(save);
 			fclose(number);
@@ -91,8 +92,15 @@ bool load(game* stats, char* name)
 	fopen_s(&save, name, "r");
 	if (save != NULL)
 	{
-		fscanf_s(save, "speed: %i time: %lf score: %lli position: %i peanulty: %lf lives: %i new_cars: %i gun: %i %i",
-			&(stats->speed), &(stats->time), &(stats->score), &(stats->position), &(stats->peanulty), &(stats->lives), &(stats->newCars), &(stats->gun.ammo), &(stats->gun.distance));
+		fscanf_s(save, "speed: %i time: %lf score: %lli position: %i peanulty: %lf lives: %i new_cars: %i gun: %i %i ",
+			&(stats->speed), &(stats->wtime), &(stats->score), &(stats->position), &(stats->peanulty), &(stats->lives), &(stats->newCars), &(stats->gun.ammo), &(stats->gun.distance));
+
+		fscanf_s(save, "otherCars:\n");
+		for (int i = 0; i < MAXCARS; i++)
+		{
+			fscanf_s(save, "speed: %i, attitiude: %i, pos: %i %i ", &(stats->cars[i].speed), &(stats->cars[i].attitiude), &(stats->cars[i].position.x), &(stats->cars[i].position.y));
+		}
+		fscanf_s(save, "powerUP: %i %i ", &(stats->powerUp.position.x), &(stats->powerUp.position.y));
 
 		stats->isPause = true;
 		fclose(save);

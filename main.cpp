@@ -1,5 +1,7 @@
 #include<stdio.h>
 #include<string.h>
+#include <time.h>
+#include <stdlib.h>
 
 #include "SDL_handler.h"
 #include "game.h"
@@ -62,21 +64,42 @@ int main(int argc, char **argv) {
 
 	screen.car = SDL_LoadBMP("./car.bmp");
 	if(screen.car == NULL) {
-		printf("SDL_LoadBMP(eti.bmp) error: %s\n", SDL_GetError());
+		printf("SDL_LoadBMP(car.bmp) error: %s\n", SDL_GetError());
 		on_exit(&screen);
 		return 1;
-		};
+	}
+
+	screen.Enemycar = SDL_LoadBMP("./enemy.bmp");
+	if (screen.Enemycar == NULL) {
+		printf("SDL_LoadBMP(enemy.bmp) error: %s\n", SDL_GetError());
+		on_exit(&screen);
+		return 1;
+	}
+
+	screen.Neutralcar = SDL_LoadBMP("./neutral.bmp");
+	if (screen.Neutralcar == NULL) {
+		printf("SDL_LoadBMP(neutral.bmp) error: %s\n", SDL_GetError());
+		on_exit(&screen);
+		return 1;
+	}
+
+	screen.plus = SDL_LoadBMP("./plus.bmp");
+	if (screen.plus == NULL) {
+		printf("SDL_LoadBMP(plus.bmp) error: %s\n", SDL_GetError());
+		on_exit(&screen);
+		return 1;
+	}
 
 	screen.bush = SDL_LoadBMP("./bush.bmp");
 	if (screen.bush == NULL) {
-		printf("SDL_LoadBMP(eti.bmp) error: %s\n", SDL_GetError());
+		printf("SDL_LoadBMP(bush.bmp) error: %s\n", SDL_GetError());
 		on_exit(&screen);
 		return 1;
 	};
 
 	screen.arrow = SDL_LoadBMP("./arrow.bmp");
 	if (screen.arrow == NULL) {
-		printf("SDL_LoadBMP(eti.bmp) error: %s\n", SDL_GetError());
+		printf("SDL_LoadBMP(arrow.bmp) error: %s\n", SDL_GetError());
 		on_exit(&screen);
 		return 1;
 	}
@@ -97,6 +120,8 @@ int main(int argc, char **argv) {
 	quit = 0;
 	game stats;
 
+	srand(time(NULL));
+
 	while(!quit) {
 		t2 = SDL_GetTicks();
 
@@ -108,7 +133,7 @@ int main(int argc, char **argv) {
 
 		if (!stats.isPause)
 		{
-			stats.time += delta;
+			stats.wtime += delta;
 
 			fpsTimer += delta;
 			if (fpsTimer > 0.5) {
@@ -118,13 +143,31 @@ int main(int argc, char **argv) {
 			};
 		}
 
-		stats.newCar();
+		
 
 		SDL_FillRect(screen.screen, NULL, czarny);
 
 		//road
 		DrawRectangle(screen.screen, 0, 56, SCREEN_WIDTH / 2 - ROAD_WIDTH, SCREEN_HEIGHT - 52, zielony, zielony);
 		DrawRectangle(screen.screen, SCREEN_WIDTH/2+ROAD_WIDTH, 56, SCREEN_WIDTH / 2 - ROAD_WIDTH, SCREEN_HEIGHT - 52, zielony, zielony);
+
+		//other cars
+		for (int i = 0; i < MAXCARS; i++)
+		{
+			if (stats.cars[i].speed > 0)
+			{
+				if (stats.cars[i].attitiude == ENEMY_CODE)
+				{
+					DrawSurface(screen.screen, screen.Enemycar, SCREEN_WIDTH / 2 + stats.cars[i].position.x, stats.cars[i].position.y / BUSH_SPEED);
+				}
+				else
+				{
+					DrawSurface(screen.screen, screen.Neutralcar, SCREEN_WIDTH / 2 + stats.cars[i].position.x, stats.cars[i].position.y / BUSH_SPEED);
+				}
+			}
+		}
+
+		DrawSurface(screen.screen, screen.plus, SCREEN_WIDTH / 2 + stats.powerUp.position.x, stats.powerUp.position.y/BUSH_SPEED);
 
 		//bush
 		DrawSurface(screen.screen, screen.bush, 60, (bush_pos[0] / BUSH_SPEED) + 46);
@@ -137,33 +180,36 @@ int main(int argc, char **argv) {
 		sprintf_s(text, "Bartosz Kopania 193169 inf gr 4");
 		DrawString(screen.screen, screen.screen->w / 2 - strlen(text) * 8 / 2, 10, text, screen.charset);
 		// "template for the second project, elapsed time = %.1lf s  %.0lf frames / s"
-		sprintf_s(text, "Wynik: %.10i, speed: %.2ikm/h, czas trwania: %.1lf s  %.0lf klatek / s", stats.score, stats.speed, stats.time, fps);
+		sprintf_s(text, "Wynik: %.10i, speed: %.2ikm/h, czas trwania: %.1lf s  %.0lf klatek / s", stats.score, stats.speed, stats.wtime, fps);
 		DrawString(screen.screen, screen.screen->w / 2 - strlen(text) * 8 / 2, 26, text, screen.charset);
 		sprintf_s(text, "Esc - wyjscie, \030 - przyspieszenie, \031 - zwolnienie");
 		DrawString(screen.screen, screen.screen->w / 2 - strlen(text) * 8 / 2, 42, text, screen.charset);
 
 		//display funcionalities
-		DrawRectangle(screen.screen, SCREEN_WIDTH-260, SCREEN_HEIGHT - 36, 250, 26, czerwony, niebieski);
-		sprintf_s(text, "abcdefgg i m o");
-		DrawString(screen.screen, SCREEN_WIDTH-250, SCREEN_HEIGHT - 26, text, screen.charset);
+		sprintf_s(text, "abcdefgg i klmno");
+		DrawRectangle(screen.screen, SCREEN_WIDTH - strlen(text) * 8 - 30, SCREEN_HEIGHT - 36, strlen(text)*8 + 20, 26, czerwony, niebieski);
+		DrawString(screen.screen, SCREEN_WIDTH-strlen(text) * 8 - 20, SCREEN_HEIGHT - 26, text, screen.charset);
 
 		DrawSurface(screen.screen, screen.car, SCREEN_WIDTH / 2 + stats.position, SCREEN_HEIGHT - CAR_POS_FROM_BOTTOM - CAR_HEIGHT);
 
 		
-		if (timeForInfo > stats.time)
+		if (timeForInfo > stats.wtime)
 		{
 			DrawString(screen.screen, 6, SCREEN_HEIGHT - 26, textInfo, screen.charset);
 		}
 
 		if (stats.isGameOver)
 		{
-			sprintf_s(text, "Game Over, Your Score is: %i, time: %.1lf", stats.score, stats.time);
+			sprintf_s(text, "Game Over, Your Score is: %i, time: %.1lf", stats.score, stats.wtime);
 			DrawString(screen.screen, SCREEN_WIDTH / 2 - strlen(text) * 4, SCREEN_HEIGHT / 2, text, screen.charset);
 		}
 
 		if (!stats.isPause)
 		{
-			if (stats.time >= stats.peanulty) stats.score += scoreByRide(delta, stats.speed);
+			stats.newCar();
+			stats.otherCarsHandler();
+			stats.powerUpHandler();
+			if (stats.wtime >= stats.peanulty) stats.score += scoreByRide(delta, stats.speed);
 			for (int i = 0; i < BUSH_NUM; i++)
 			{
 				bush_pos[i] += stats.speed;
@@ -202,7 +248,7 @@ int main(int argc, char **argv) {
 						if (!showScore(mode, screen))
 						{
 							sprintf_s(textInfo, "No highScores curently!!!");
-							timeForInfo = stats.time + 5;
+							timeForInfo = stats.wtime + 5;
 						}
 					}
 					else if (screen.event.key.keysym.sym == SDLK_s && !stats.isGameOver)
@@ -215,7 +261,7 @@ int main(int argc, char **argv) {
 						{
 							sprintf_s(textInfo, "Saving Failed!!!");
 						}
-						timeForInfo = stats.time + 5;
+						timeForInfo = stats.wtime + 5;
 					}
 					else if (screen.event.key.keysym.sym == SDLK_l)
 					{
@@ -227,8 +273,9 @@ int main(int argc, char **argv) {
 						{
 							sprintf_s(textInfo, "Loading failed!!!");
 						}
-						timeForInfo = stats.time + 5;
+						timeForInfo = stats.wtime + 5;
 					}
+					else if (screen.event.key.keysym.sym == SDLK_q && !stats.isPause) stats.shooting();
 					else if (screen.event.key.keysym.sym == SDLK_UP && !stats.isPause) stats.speeding();
 					else if (screen.event.key.keysym.sym == SDLK_DOWN && !stats.isPause) stats.slowing();
 					else if (screen.event.key.keysym.sym == SDLK_RIGHT && !stats.isPause) stats.movingToRight();
@@ -275,7 +322,7 @@ void onFinish(_screen screen, game stats)
 			switch (screen.event.type) {
 			case SDL_KEYDOWN:
 				if (screen.event.key.keysym.sym == SDLK_ESCAPE) end = true;
-				else if (screen.event.key.keysym.sym == SDLK_RETURN) { addScore(stats.score, stats.time); end = true; }
+				else if (screen.event.key.keysym.sym == SDLK_RETURN) { addScore(stats.score, stats.wtime); end = true; }
 				break;
 			case SDL_KEYUP:
 				break;
