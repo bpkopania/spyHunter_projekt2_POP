@@ -308,7 +308,7 @@ void game::powerUpHandler()
 				{
 					powerUp.alive = false;
 					setNewGun();
-					isPause = true;
+					//isPause = true;
 				}
 			}
 		}
